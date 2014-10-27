@@ -1,7 +1,6 @@
 package pl.edu.agh.ed.dao;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -9,20 +8,19 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
 import pl.edu.agh.ed.objects.Author;
 
 public class AuthorManipulate {
-	private static SessionFactory factory;
+	private static SessionFactory factory = new AnnotationConfiguration().configure().
+			addAnnotatedClass(Author.class).buildSessionFactory();
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		try {
 			factory = new AnnotationConfiguration().configure().
-			// addPackage("com.xyz") //add package if used.
 					addAnnotatedClass(Author.class).buildSessionFactory();
 
 		} catch (Throwable ex) {
@@ -39,6 +37,17 @@ public class AuthorManipulate {
 
 	}
 
+	public SessionFactory getFactory (){
+		try {
+			return new AnnotationConfiguration().configure()
+					.addAnnotatedClass(Author.class).buildSessionFactory();
+
+		} catch (Throwable ex) {
+			System.err.println("Failed to create sessionFactory object." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+	
 	public Integer addAuthor(String link, String name) {
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -83,6 +92,30 @@ public class AuthorManipulate {
 		} finally {
 			session.close();
 		}
+	}
+	
+	public Author getAuthorStartWith (String name) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			Criteria cr = session.createCriteria(Author.class);
+			// Add restriction.
+			cr.add(Restrictions.like("name", name, MatchMode.START));
+
+			for (Iterator iterator = cr.list().iterator(); iterator.hasNext();) {
+				Author author = (Author) iterator.next();
+				return author;
+			}
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
 	}
 
 }
