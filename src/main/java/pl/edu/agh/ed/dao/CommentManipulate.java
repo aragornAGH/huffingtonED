@@ -6,37 +6,35 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.AnnotationConfiguration;
 
 import pl.edu.agh.ed.objects.Author;
 import pl.edu.agh.ed.objects.Category;
+import pl.edu.agh.ed.objects.Comment;
 import pl.edu.agh.ed.objects.Post;
 
-public class PostManipulate {
+public class CommentManipulate {
 
-	private SessionFactory factory;
-
-	public PostManipulate(SessionFactory factory) {
+private SessionFactory factory;
+	
+	public CommentManipulate(SessionFactory factory){
 		this.factory = factory;
 	}
-
-	public Integer addPost(String content, Date date, String link,
-			String title, Author author, Category category, Boolean done) {
+	
+	public Comment addComment(String content, Date date, String title, Author author, Comment parentComment, Post post) {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		Integer employeeID = null;
 		try {
 			tx = session.beginTransaction();
-			Post post = new Post();
-			post.setContent(content);
-			post.setDate(date);
-			post.setLink(link);
-			post.setTitle(title);
-			post.setAuthor(author);
-			post.setCategory(category);
-			post.setZrobiona(done);
-			session.persist(post);
+			Comment comment = new Comment();
+			comment.setComment(comment);
+			comment.setDate(date);
+			comment.setTitle(title);
+			comment.setAuthor(author);
+			comment.setComment(comment);
+			comment.setPost(post);			
+			session.persist(comment);
 			tx.commit();
+			return comment;
 		} catch (HibernateException e) {
 			if (tx != null)
 				tx.rollback();
@@ -44,6 +42,6 @@ public class PostManipulate {
 		} finally {
 			session.close();
 		}
-		return employeeID;
+		return null;
 	}
 }

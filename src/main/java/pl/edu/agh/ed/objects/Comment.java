@@ -1,17 +1,22 @@
 package pl.edu.agh.ed.objects;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "comments")
-public class Comment {
+public class Comment implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,11 +35,17 @@ public class Comment {
 	@Column(name = "author_id")
 	private Author author;
 
-	@Column(name = "parent_comment")
+	@ManyToOne
+	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
-	@Column(name = "post_id")
+	@ManyToOne
+	@JoinColumn(name = "post_id")
 	private Post post;
+	
+	@OneToMany
+	private Set<CommentTopic> commentTopics;
+	
 
 	public int getId() {
 		return id;
@@ -82,6 +93,30 @@ public class Comment {
 
 	public void setPost_id(Post post) {
 		this.post = post;
+	}
+
+	public Author getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(Author author) {
+		this.author = author;
+	}
+
+	public Post getPost() {
+		return post;
+	}
+
+	public void setPost(Post post) {
+		this.post = post;
+	}
+	
+	public Set<CommentTopic> getCommentTopics() {
+		return commentTopics;
+	}
+
+	public void setCommentTopics(Set<CommentTopic> commentTopics) {
+		this.commentTopics = commentTopics;
 	}
 
 }

@@ -1,12 +1,16 @@
 package pl.edu.agh.ed.objects;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -30,9 +34,30 @@ public class Post {
 	@Column(name = "title")
 	private String title;
 
-	private int author_id;
+	@ManyToOne
+	@JoinColumn(name = "author_id")
+	private Author author;
 
-	private int category_id;
+	@ManyToOne
+	@JoinColumn(name = "category_id")
+	private Category category;
+	
+	@OneToMany
+	private Set<Comment> comments;
+	
+	@OneToMany
+	private Set<PostTag> postTags;
+	
+	@OneToMany
+	private Set<PostTopic> postTopics;
+	
+	public Set<PostTopic> getPostTopics() {
+		return postTopics;
+	}
+
+	public void setPostTopics(Set<PostTopic> postTopics) {
+		this.postTopics = postTopics;
+	}
 
 	@Column(name = "zrobiona")
 	private Boolean zrobiona;
@@ -80,20 +105,36 @@ public class Post {
 		this.title = title;
 	}
 
-	public int getAuthor() {
-		return author_id;
+	public Author getAuthor() {
+		return author;
 	}
 
-	public void setAuthor(int author) {
-		this.author_id = author;
+	public void setAuthor(Author author) {
+		this.author = author;
 	}
 
-	public int getCategory() {
-		return category_id;
+	public Category getCategory() {
+		return category;
 	}
 
-	public void setCategory(int category) {
-		this.category_id = category;
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public Set<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Set<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public Set<PostTag> getPostTags() {
+		return postTags;
+	}
+
+	public void setPostTags(Set<PostTag> postTags) {
+		this.postTags = postTags;
 	}
 
 	public Boolean getZrobiona() {
