@@ -7,45 +7,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
 import pl.edu.agh.ed.objects.Author;
 
 public class AuthorManipulate {
-	private static SessionFactory factory = new AnnotationConfiguration().configure().
-			addAnnotatedClass(Author.class).buildSessionFactory();
 
-	@SuppressWarnings("deprecation")
-	public static void main(String[] args) {
-		try {
-			factory = new AnnotationConfiguration().configure().
-					addAnnotatedClass(Author.class).buildSessionFactory();
-
-		} catch (Throwable ex) {
-			System.err.println("Failed to create sessionFactory object." + ex);
-			throw new ExceptionInInitializerError(ex);
-		}
-		AuthorManipulate AM = new AuthorManipulate();
-
-		/* Add few employee records in database */
-		AM.addAuthor("www.onetaaa.pl", "Ali");
-
-		/* List down all the employees */
-		// AM.listEmployees();
-
-	}
-
-	public SessionFactory getFactory (){
-		try {
-			return new AnnotationConfiguration().configure()
-					.addAnnotatedClass(Author.class).buildSessionFactory();
-
-		} catch (Throwable ex) {
-			System.err.println("Failed to create sessionFactory object." + ex);
-			throw new ExceptionInInitializerError(ex);
-		}
+	private SessionFactory factory;
+	
+	public AuthorManipulate(SessionFactory factory){
+		this.factory = factory;
 	}
 	
 	public Integer addAuthor(String link, String name) {

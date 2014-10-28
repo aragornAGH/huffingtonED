@@ -4,28 +4,27 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.AnnotationConfiguration;
 
-import pl.edu.agh.ed.objects.Author;
-import pl.edu.agh.ed.objects.Category;
+import pl.edu.agh.ed.objects.Tag;
 
-public class CategoryManipulate {
-private SessionFactory factory;
+public class TagManipulate {
+
+	private SessionFactory factory;
 	
-	public CategoryManipulate(SessionFactory factory){
+	public TagManipulate(SessionFactory factory){
 		this.factory = factory;
 	}
-		
-	public Category addCategory(String name) {
+	
+	public Tag addComment(String name) {
 		Session session = factory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
-			Category category = new Category();
-			category.setCategoryName(name);
-			session.persist(category);
+			Tag tag = new Tag();
+			tag.setName(name);
+			session.persist(tag);
 			tx.commit();
-			return category;
+			return tag;
 		} catch (HibernateException e) {
 			if (tx != null)
 				tx.rollback();
