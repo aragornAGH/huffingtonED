@@ -55,11 +55,8 @@ public class ManipulateData {
 	private static final String PATTERN_DELETE_TAGS = "(?i)<(?!(/?(a)))[^>]*>";
 	private static final String PATTERN_GET_SITE_ID = "\\_n_([^)]+)\\.html";
 	private static final int MAX_NUM_RES = 50;
-	private static final String API_KEY = "AIzaSyDI-nSUyj00YybQC2fFRlIHNeQaJSjewgQ";
-	private static final String CSE_ID = "002577277401686363544:hmnmu1yregs";
 	private static final String TITLE_CLASS = "title";
 	private static final String CONTENT_ID = "mainentrycontent";
-	private static final String ACCOUNT_KEY = "es1/e7JOJ0vj1UIn19VymbN3LQe0+fktfc3FDoUjYTA";
 	private static final String QUERY = "http://www.huffingtonpost.com/2014/10/";
 	private static final String FB_COMMENTS_START = "https://www.facebook.com/plugins/comments.php?"
 			+ "api_key=46744042133"
@@ -85,7 +82,7 @@ public class ManipulateData {
 		// PostManipulate PM = new
 		// PostManipulate(FactoryMaker.getSessionFactory(Post.class));
 		//
-		// PM.addPost("treúÊ", new Date(), "www.wp.pl", "tytul", a, category,
+		// PM.addPost("tre—ö–∂", new Date(), "www.wp.pl", "tytul", a, category,
 		// Boolean.TRUE);
 
 		// AuthorManipulate AM = new AuthorManipulate(
