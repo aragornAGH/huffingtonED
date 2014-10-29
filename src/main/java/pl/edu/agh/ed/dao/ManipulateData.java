@@ -94,7 +94,6 @@ public class ManipulateData {
 
 		parsePageAndAddToDB("http://www.huffingtonpost.com/2014/08/11/russia-ukraine_n_5668398.html");
 	}
-
 	private static void parsePageAndAddToDB(String site) {
 		try {
 			PostManipulate PM = new PostManipulate(

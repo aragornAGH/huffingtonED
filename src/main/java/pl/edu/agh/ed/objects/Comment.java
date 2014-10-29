@@ -31,10 +31,11 @@ public class Comment implements Serializable {
 
 	@Column(name = "title")
 	private String title;
-
-	@Column(name = "author_id")
+	
+	@ManyToOne
+	@JoinColumn(name = "author_id")
 	private Author author;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "parent_comment")
 	private Comment comment;

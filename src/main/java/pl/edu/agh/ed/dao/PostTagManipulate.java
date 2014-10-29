@@ -11,7 +11,7 @@ import pl.edu.agh.ed.objects.Tag;
 
 public class PostTagManipulate {
 
-private SessionFactory factory;
+	private SessionFactory factory;
 	
 	public PostTagManipulate(SessionFactory factory){
 		this.factory = factory;

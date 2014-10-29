@@ -22,11 +22,10 @@ public class PostManipulate {
 		this.factory = factory;
 	}
 
-	public Integer addPost(String content, Date date, String link,
+	public Post addPost(String content, Date date, String link,
 			String title, Author author, Category category, Boolean done) {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		Integer employeeID = null;
 		try {
 			tx = session.beginTransaction();
 			Post post = new Post();
@@ -39,6 +38,7 @@ public class PostManipulate {
 			post.setZrobiona(done);
 			session.persist(post);
 			tx.commit();
+			return post;
 		} catch (HibernateException e) {
 			if (tx != null)
 				tx.rollback();
@@ -46,7 +46,7 @@ public class PostManipulate {
 		} finally {
 			session.close();
 		}
-		return employeeID;
+		return null;
 	}
 
 	public boolean checkIfExistsLink(String site) {

@@ -15,11 +15,12 @@ public class TopicManipulate {
 
 	private SessionFactory factory;
 
+
 	public TopicManipulate(SessionFactory factory) {
 		this.factory = factory;
 	}
 
-	public Topic addComment(String keywords) {
+	public  Topic addTopic(String keywords) {
 		Session session = factory.openSession();
 		Transaction tx = null;
 		try {

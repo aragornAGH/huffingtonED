@@ -68,6 +68,7 @@ public class AuthorManipulate {
 		}
 	}
 
+
 	public Author getAuthorStartWith(String name) {
 		Session session = factory.openSession();
 		Transaction tx = null;
