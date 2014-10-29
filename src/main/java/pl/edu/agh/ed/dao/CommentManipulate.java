@@ -25,7 +25,7 @@ public class CommentManipulate {
 		try {
 			tx = session.beginTransaction();
 			Comment comment = new Comment();
-			comment.setComment(comment);
+			comment.setContent(content);
 			comment.setDate(date);
 			comment.setTitle(title);
 			comment.setAuthor(author);
