@@ -33,6 +33,6 @@ public class TopicManipulate {
 		} finally {
 			session.close();
 		}
-		return null ;
+		return null;
 	}
 }
