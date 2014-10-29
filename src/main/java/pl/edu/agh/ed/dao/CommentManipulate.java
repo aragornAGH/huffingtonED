@@ -8,13 +8,12 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import pl.edu.agh.ed.objects.Author;
-import pl.edu.agh.ed.objects.Category;
 import pl.edu.agh.ed.objects.Comment;
 import pl.edu.agh.ed.objects.Post;
 
 public class CommentManipulate {
 
-private SessionFactory factory;
+	private SessionFactory factory;
 	
 	public CommentManipulate(SessionFactory factory){
 		this.factory = factory;
@@ -26,7 +25,7 @@ private SessionFactory factory;
 		try {
 			tx = session.beginTransaction();
 			Comment comment = new Comment();
-			comment.setComment(comment);
+			comment.setContent(content);
 			comment.setDate(date);
 			comment.setTitle(title);
 			comment.setAuthor(author);
