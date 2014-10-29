@@ -66,7 +66,7 @@ public class ManipulateData {
 			+ "&channel_url=http%3A%2F%2Fstatic.ak.facebook.com%2Fconnect%2Fxd_arbiter%2F2_ZudbRXWRs.js%3Fversion%3D41%23cb%3Df1ce5c815c%26domain%3Dwww.huffingtonpost.com%26origin%3Dhttp%253A%252F%252Fwww.huffingtonpost.com%252Ffad39a6b%26relation%3Dparent.parent"
 			+ "&colorscheme=light" + "&href=";
 	private static final String FB_COMMENTS_END = "&locale=en_US"
-			+ "&numposts=100" + "&sdk=joey" + "&skin=light" + "&width=570";
+			+ "&numposts=50" + "&sdk=joey" + "&skin=light" + "&width=570";
 	private static final String EMBED_START = "http://api.embed.ly/1/extract?key=49584e957b1b4f3b988a2a2ea36cc704&url=";
 	private static final String EMBED_END = "&format=json";
 
