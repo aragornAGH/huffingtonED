@@ -11,11 +11,11 @@ import pl.edu.agh.ed.objects.Topic;
 
 public class CommentTopicManipulate {
 	private SessionFactory factory;
-	
-	public CommentTopicManipulate(SessionFactory factory){
+
+	public CommentTopicManipulate(SessionFactory factory) {
 		this.factory = factory;
 	}
-	
+
 	public CommentTopic addComment(Comment comment, Topic topic, double prob) {
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -36,5 +36,21 @@ public class CommentTopicManipulate {
 			session.close();
 		}
 		return null;
+	}
+
+	public void addCommentTopic(CommentTopic commentTopic) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.persist(commentTopic);
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 	}
 }

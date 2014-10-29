@@ -11,12 +11,12 @@ import pl.edu.agh.ed.objects.Topic;
 
 public class PostTopicManipulate {
 
-private SessionFactory factory;
-	
-	public PostTopicManipulate(SessionFactory factory){
+	private SessionFactory factory;
+
+	public PostTopicManipulate(SessionFactory factory) {
 		this.factory = factory;
 	}
-	
+
 	public PostTopic addComment(Post post, Topic topic, double prob) {
 		Session session = factory.openSession();
 		Transaction tx = null;
@@ -37,5 +37,21 @@ private SessionFactory factory;
 			session.close();
 		}
 		return null;
+	}
+
+	public void addPostTopic(PostTopic postTopic) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.persist(postTopic);
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 	}
 }

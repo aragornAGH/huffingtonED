@@ -15,20 +15,23 @@ import pl.edu.agh.ed.objects.Author;
 public class AuthorManipulate {
 
 	private SessionFactory factory;
-	
-	public AuthorManipulate(SessionFactory factory){
+
+	public AuthorManipulate(SessionFactory factory) {
 		this.factory = factory;
 	}
-	
-	public Integer addAuthor(String link, String name) {
+
+	public void addAuthor(String link, String name) {
+		Author author = new Author();
+		author.setLink(link);
+		author.setName(name);
+		addAuthor(author);
+	}
+
+	public void addAuthor(Author author) {
 		Session session = factory.openSession();
 		Transaction tx = null;
-		Integer employeeID = null;
 		try {
 			tx = session.beginTransaction();
-			Author author = new Author();
-			author.setName(name);
-			author.setLink(link);
 			session.persist(author);
 			tx.commit();
 		} catch (HibernateException e) {
@@ -38,7 +41,6 @@ public class AuthorManipulate {
 		} finally {
 			session.close();
 		}
-		return employeeID;
 	}
 
 	/* Method to READ all the employees having salary more than 2000 */
@@ -75,6 +77,55 @@ public class AuthorManipulate {
 			Criteria cr = session.createCriteria(Author.class);
 			// Add restriction.
 			cr.add(Restrictions.like("name", name, MatchMode.START));
+
+			for (Iterator iterator = cr.list().iterator(); iterator.hasNext();) {
+				Author author = (Author) iterator.next();
+				return author;
+			}
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public Author getAuthorByName(String name) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			Criteria cr = session.createCriteria(Author.class);
+			// Add restriction.
+			cr.add(Restrictions.eq("name", name));
+
+			for (Iterator iterator = cr.list().iterator(); iterator.hasNext();) {
+				Author author = (Author) iterator.next();
+				return author;
+			}
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return null;
+	}
+
+	public Author checkIfExistsAuthor(Author authorToSearch) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			Criteria cr = session.createCriteria(Author.class);
+			// Add restriction.
+			cr.add(Restrictions.eq("name", authorToSearch.getName()));
+			cr.add(Restrictions.eq("link", authorToSearch.getLink()));
 
 			for (Iterator iterator = cr.list().iterator(); iterator.hasNext();) {
 				Author author = (Author) iterator.next();
