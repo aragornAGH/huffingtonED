@@ -37,4 +37,20 @@ private SessionFactory factory;
 		}
 		return null;
 	}
+
+	public void addPostTag(PostTag postTag) {
+		Session session = factory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.persist(postTag);
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+	}
 }

@@ -34,6 +34,9 @@ public class Post {
 	@Column(name = "title")
 	private String title;
 
+	@Column(name = "site_id")
+	private Integer site;
+
 	@ManyToOne
 	@JoinColumn(name = "author_id")
 	private Author author;
@@ -41,16 +44,16 @@ public class Post {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
-	
+
 	@OneToMany
 	private Set<Comment> comments;
-	
+
 	@OneToMany
 	private Set<PostTag> postTags;
-	
+
 	@OneToMany
 	private Set<PostTopic> postTopics;
-	
+
 	public Set<PostTopic> getPostTopics() {
 		return postTopics;
 	}
@@ -143,6 +146,14 @@ public class Post {
 
 	public void setZrobiona(Boolean zrobiona) {
 		this.zrobiona = zrobiona;
+	}
+
+	public Integer getSite() {
+		return site;
+	}
+
+	public void setSite(Integer site) {
+		this.site = site;
 	}
 
 }
