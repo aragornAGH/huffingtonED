@@ -92,8 +92,9 @@ public class ManipulateData {
 		// FactoryMaker.getSessionFactory(Author.class));
 		// Author a = AM.getAuthorByName("Brian");
 
-		parsePageAndAddToDB("http://www.huffingtonpost.com/2014/08/11/russia-ukraine_n_5668398.html");
+		parsePageAndAddToDB("http://www.huffingtonpost.com/2014/08/25/beyonce-feminist-vmas_n_5708475.html");
 	}
+
 	private static void parsePageAndAddToDB(String site) {
 		try {
 			PostManipulate PM = new PostManipulate(
@@ -226,6 +227,7 @@ public class ManipulateData {
 			// 8+9
 			Document docFb = Jsoup.connect(
 					FB_COMMENTS_START + site + FB_COMMENTS_END).get();
+
 			for (Element el : docFb.getElementsByClass("fbTopLevelComment")) {
 				Comment comment = new Comment();
 				comment.setPost(post);
@@ -276,6 +278,42 @@ public class ManipulateData {
 							"EEEE, MMMM d, yyyy 'at' h:mma", Locale.US);
 					comment.setDate(dateFormat.parse(elDate.attr("title")));
 				}
+
+				Comment findedComment = CommentM.getCommentByName(comment);
+				if (findedComment != null) {
+					comment = findedComment;
+				} else {
+					if (comment.getContent() == null
+							&& comment.getTitle() == null) {
+						System.err.println("Koment jest pusty!!!");
+						return;
+					}
+					CommentM.addComment(comment);
+					if (comment.getId() == 0) {
+						System.err.println("Koment nie zapisal sie!!!");
+						return;
+					}
+				}
+				topic = new Topic();
+				topic.setKeywords(countWords(comment.getContent()));
+				findedTopic = TopicM.getTopicByName(topic.getKeywords());
+				if (findedTopic != null) {
+					topic = findedTopic;
+				} else {
+					if (topic.getKeywords() == null) {
+						System.err.println("Topic jest pusty!!!");
+						return;
+					}
+					TopicM.addTopic(topic);
+					if (topic.getId() == 0) {
+						System.err.println("Topic nie zapisal sie!!!");
+						return;
+					}
+				}
+				CommentTopic commentTopic = new CommentTopic();
+				commentTopic.setComment_id(comment);
+				commentTopic.setTopic_id(topic);
+				CTopicM.addCommentTopic(commentTopic);
 
 				for (Element elReplies : el.child(0).getElementsByClass(
 						"fbCommentReply")) {
@@ -334,8 +372,7 @@ public class ManipulateData {
 					}
 					commentReply.setComment(comment);
 
-					Comment findedComment = CommentM
-							.getCommentByName(commentReply);
+					findedComment = CommentM.getCommentByName(commentReply);
 					if (findedComment != null) {
 						commentReply = findedComment;
 					} else {
@@ -367,47 +404,12 @@ public class ManipulateData {
 						}
 					}
 
-					CommentTopic commentTopic = new CommentTopic();
+					commentTopic = new CommentTopic();
 					commentTopic.setComment_id(commentReply);
 					commentTopic.setTopic_id(topic);
 					CTopicM.addCommentTopic(commentTopic);
 				}
 
-				Comment findedComment = CommentM.getCommentByName(comment);
-				if (findedComment != null) {
-					comment = findedComment;
-				} else {
-					if (comment.getContent() == null
-							&& comment.getTitle() == null) {
-						System.err.println("Koment jest pusty!!!");
-						return;
-					}
-					CommentM.addComment(comment);
-					if (comment.getId() == 0) {
-						System.err.println("Koment nie zapisal sie!!!");
-						return;
-					}
-				}
-				topic = new Topic();
-				topic.setKeywords(countWords(comment.getContent()));
-				findedTopic = TopicM.getTopicByName(topic.getKeywords());
-				if (findedTopic != null) {
-					topic = findedTopic;
-				} else {
-					if (topic.getKeywords() == null) {
-						System.err.println("Topic jest pusty!!!");
-						return;
-					}
-					TopicM.addTopic(topic);
-					if (topic.getId() == 0) {
-						System.err.println("Topic nie zapisal sie!!!");
-						return;
-					}
-				}
-				CommentTopic commentTopic = new CommentTopic();
-				commentTopic.setComment_id(comment);
-				commentTopic.setTopic_id(topic);
-				CTopicM.addCommentTopic(commentTopic);
 			}
 			System.out.println("KONIEC!!! WYLACZ APKE!!!");
 		} catch (IOException e) {

@@ -22,6 +22,7 @@
 		</property>
 
 		<mapping class="pl.edu.agh.ed.objects.Author" />
+		<mapping class="pl.edu.agh.ed.objects.Topic" />
 		<mapping class="pl.edu.agh.ed.objects.Post"/>
 		<mapping class="pl.edu.agh.ed.objects.Category"/>
 		<mapping class="pl.edu.agh.ed.objects.Comment"/>
@@ -29,7 +30,7 @@
 		<mapping class="pl.edu.agh.ed.objects.PostTag"/>
 		<mapping class="pl.edu.agh.ed.objects.PostTopic"/>
 		<mapping class="pl.edu.agh.ed.objects.Tag"/>
-		<mapping class="pl.edu.agh.ed.objects.Topic"/>
+		
 		
 	</session-factory>
 </hibernate-configuration>
