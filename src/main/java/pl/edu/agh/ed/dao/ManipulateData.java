@@ -1,6 +1,8 @@
 package pl.edu.agh.ed.dao;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -67,6 +69,25 @@ public class ManipulateData {
 	private static final String EMBED_START = "http://api.embed.ly/1/extract?key=49584e957b1b4f3b988a2a2ea36cc704&url=";
 	private static final String EMBED_END = "&format=json";
 
+	private static PostManipulate PM = new PostManipulate(
+			FactoryMaker.getSessionFactory(Post.class));
+	private static CommentTopicManipulate CTopicM = new CommentTopicManipulate(
+			FactoryMaker.getSessionFactory(CommentTopic.class));
+	private static AuthorManipulate AM = new AuthorManipulate(
+			FactoryMaker.getSessionFactory(Author.class));
+	private static CategoryManipulate CM = new CategoryManipulate(
+			FactoryMaker.getSessionFactory(Category.class));
+	private static TagManipulate TM = new TagManipulate(
+			FactoryMaker.getSessionFactory(Tag.class));
+	private static PostTagManipulate PTM = new PostTagManipulate(
+			FactoryMaker.getSessionFactory(PostTag.class));
+	private static TopicManipulate TopicM = new TopicManipulate(
+			FactoryMaker.getSessionFactory(Topic.class));
+	private static CommentManipulate CommentM = new CommentManipulate(
+			FactoryMaker.getSessionFactory(Comment.class));
+	private static PostTopicManipulate PTopicM = new PostTopicManipulate(
+			FactoryMaker.getSessionFactory(PostTopic.class));
+
 	public static void main(String[] args) {
 
 		// AuthorManipulate AM = new
@@ -89,29 +110,32 @@ public class ManipulateData {
 		// FactoryMaker.getSessionFactory(Author.class));
 		// Author a = AM.getAuthorByName("Brian");
 
-		parsePageAndAddToDB("http://www.huffingtonpost.com/2014/08/25/beyonce-feminist-vmas_n_5708475.html");
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(
+					"e:\\Studia\\Eksploracja\\HuffingtonCrawler\\output.txt"));
+			String line;
+			while ((line = br.readLine()) != null) {
+				parsePageAndAddToDB(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 	}
 
 	private static void parsePageAndAddToDB(String site) {
 		try {
-			PostManipulate PM = new PostManipulate(
-					FactoryMaker.getSessionFactory(Post.class));
-			CommentTopicManipulate CTopicM = new CommentTopicManipulate(
-					FactoryMaker.getSessionFactory(CommentTopic.class));
-			AuthorManipulate AM = new AuthorManipulate(
-					FactoryMaker.getSessionFactory(Author.class));
-			CategoryManipulate CM = new CategoryManipulate(
-					FactoryMaker.getSessionFactory(Category.class));
-			TagManipulate TM = new TagManipulate(
-					FactoryMaker.getSessionFactory(Tag.class));
-			PostTagManipulate PTM = new PostTagManipulate(
-					FactoryMaker.getSessionFactory(PostTag.class));
-			TopicManipulate TopicM = new TopicManipulate(
-					FactoryMaker.getSessionFactory(Topic.class));
-			CommentManipulate CommentM = new CommentManipulate(
-					FactoryMaker.getSessionFactory(Comment.class));
-			PostTopicManipulate PTopicM = new PostTopicManipulate(
-					FactoryMaker.getSessionFactory(PostTopic.class));
 			if (PM.checkIfExistsLink(site)) {
 				System.err.println("Post juz istnieje!!!");
 				return;
