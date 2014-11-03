@@ -12,7 +12,7 @@
 			org.postgresql.Driver
 		</property>
 		<property name="hibernate.connection.url">
-			jdbc:postgresql://localhost:5432/old_huffington
+			jdbc:postgresql://localhost:5432/huffington
 		</property>
 		<property name="hibernate.connection.username">
 			postgres
@@ -23,14 +23,14 @@
 
 		<mapping class="pl.edu.agh.ed.objects.Author" />
 		<mapping class="pl.edu.agh.ed.objects.Topic" />
-		<mapping class="pl.edu.agh.ed.objects.Post"/>
-		<mapping class="pl.edu.agh.ed.objects.Category"/>
-		<mapping class="pl.edu.agh.ed.objects.Comment"/>
-		<mapping class="pl.edu.agh.ed.objects.CommentTopic"/>
-		<mapping class="pl.edu.agh.ed.objects.PostTag"/>
-		<mapping class="pl.edu.agh.ed.objects.PostTopic"/>
-		<mapping class="pl.edu.agh.ed.objects.Tag"/>
-		
-		
+		<mapping class="pl.edu.agh.ed.objects.Post" />
+		<mapping class="pl.edu.agh.ed.objects.Category" />
+		<mapping class="pl.edu.agh.ed.objects.Comment" />
+		<mapping class="pl.edu.agh.ed.objects.CommentTopic" />
+		<mapping class="pl.edu.agh.ed.objects.PostTag" />
+		<mapping class="pl.edu.agh.ed.objects.PostTopic" />
+		<mapping class="pl.edu.agh.ed.objects.Tag" />
+
+
 	</session-factory>
 </hibernate-configuration>

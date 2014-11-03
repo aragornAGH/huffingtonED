@@ -70,46 +70,25 @@ public class ManipulateData {
 	private static final String EMBED_END = "&format=json";
 
 	private static PostManipulate PM = new PostManipulate(
-			FactoryMaker.getSessionFactory(Post.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Post.class));
 	private static CommentTopicManipulate CTopicM = new CommentTopicManipulate(
-			FactoryMaker.getSessionFactory(CommentTopic.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(CommentTopic.class));
 	private static AuthorManipulate AM = new AuthorManipulate(
-			FactoryMaker.getSessionFactory(Author.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Author.class));
 	private static CategoryManipulate CM = new CategoryManipulate(
-			FactoryMaker.getSessionFactory(Category.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Category.class));
 	private static TagManipulate TM = new TagManipulate(
-			FactoryMaker.getSessionFactory(Tag.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Tag.class));
 	private static PostTagManipulate PTM = new PostTagManipulate(
-			FactoryMaker.getSessionFactory(PostTag.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(PostTag.class));
 	private static TopicManipulate TopicM = new TopicManipulate(
-			FactoryMaker.getSessionFactory(Topic.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Topic.class));
 	private static CommentManipulate CommentM = new CommentManipulate(
-			FactoryMaker.getSessionFactory(Comment.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(Comment.class));
 	private static PostTopicManipulate PTopicM = new PostTopicManipulate(
-			FactoryMaker.getSessionFactory(PostTopic.class));
+			OldHuffingtonFactoryMaker.getSessionFactory(PostTopic.class));
 
 	public static void main(String[] args) {
-
-		// AuthorManipulate AM = new
-		// AuthorManipulate(FactoryMaker.getSessionFactory(Author.class));
-		//
-		// Author a = AM.getAuthorStartWith("Brian");
-		// System.out.println(a);
-		// CategoryManipulate CM = new
-		// CategoryManipulate(FactoryMaker.getSessionFactory(Category.class));
-		//
-		//
-		// Category category = CM.addCategory("kategoria3333");
-		// PostManipulate PM = new
-		// PostManipulate(FactoryMaker.getSessionFactory(Post.class));
-		//
-		// PM.addPost("treњж", new Date(), "www.wp.pl", "tytul", a, category,
-		// Boolean.TRUE);
-
-		// AuthorManipulate AM = new AuthorManipulate(
-		// FactoryMaker.getSessionFactory(Author.class));
-		// Author a = AM.getAuthorByName("Brian");
-
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(
@@ -131,7 +110,6 @@ public class ManipulateData {
 				}
 			}
 		}
-
 	}
 
 	private static void parsePageAndAddToDB(String site) {
