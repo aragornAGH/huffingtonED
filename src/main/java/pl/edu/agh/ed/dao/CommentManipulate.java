@@ -2,9 +2,11 @@ package pl.edu.agh.ed.dao;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -13,7 +15,6 @@ import org.hibernate.criterion.Restrictions;
 import pl.edu.agh.ed.objects.Author;
 import pl.edu.agh.ed.objects.Comment;
 import pl.edu.agh.ed.objects.Post;
-import pl.edu.agh.ed.objects.Tag;
 
 public class CommentManipulate {
 
@@ -85,6 +86,51 @@ public class CommentManipulate {
 			if (tx != null)
 				tx.rollback();
 			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+	}
+
+	public static boolean mergeAllComments(SessionFactory from,
+			SessionFactory to, int firstResult, int maxResults) {
+		Session session = from.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			Query query = session.createQuery("from Comment")
+					.setFirstResult(firstResult).setMaxResults(maxResults);
+
+			boolean bool = mergeComments(to, query.list());
+
+			tx.commit();
+			return bool;
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+			return false;
+		} finally {
+			session.close();
+		}
+	}
+
+	private static boolean mergeComments(SessionFactory to,
+			List<Comment> comments) {
+		if (comments == null || comments.size() == 0)
+			return false;
+		Session session = to.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			for (Comment comment : comments)
+				session.merge(comment);
+			tx.commit();
+			return true;
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+			return false;
 		} finally {
 			session.close();
 		}

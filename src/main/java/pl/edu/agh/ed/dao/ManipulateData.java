@@ -1,8 +1,6 @@
 package pl.edu.agh.ed.dao;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,11 +36,7 @@ import org.jsoup.select.Elements;
 import pl.edu.agh.ed.objects.Author;
 import pl.edu.agh.ed.objects.Category;
 import pl.edu.agh.ed.objects.Comment;
-import pl.edu.agh.ed.objects.CommentTopic;
 import pl.edu.agh.ed.objects.Post;
-import pl.edu.agh.ed.objects.PostTag;
-import pl.edu.agh.ed.objects.PostTopic;
-import pl.edu.agh.ed.objects.Tag;
 import pl.edu.agh.ed.objects.Topic;
 
 public class ManipulateData {
@@ -69,356 +63,348 @@ public class ManipulateData {
 	private static final String EMBED_START = "http://api.embed.ly/1/extract?key=49584e957b1b4f3b988a2a2ea36cc704&url=";
 	private static final String EMBED_END = "&format=json";
 
-	private static PostManipulate PM = new PostManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Post.class));
-	private static CommentTopicManipulate CTopicM = new CommentTopicManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(CommentTopic.class));
-	private static AuthorManipulate AM = new AuthorManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Author.class));
-	private static CategoryManipulate CM = new CategoryManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Category.class));
-	private static TagManipulate TM = new TagManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Tag.class));
-	private static PostTagManipulate PTM = new PostTagManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(PostTag.class));
-	private static TopicManipulate TopicM = new TopicManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Topic.class));
-	private static CommentManipulate CommentM = new CommentManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(Comment.class));
-	private static PostTopicManipulate PTopicM = new PostTopicManipulate(
-			OldHuffingtonFactoryMaker.getSessionFactory(PostTopic.class));
-
 	public static void main(String[] args) {
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(
-					"e:\\Studia\\Eksploracja\\HuffingtonCrawler\\output.txt"));
-			String line;
-			while ((line = br.readLine()) != null) {
-				parsePageAndAddToDB(line);
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		// mergeAllPosts();
+		// mergeAllComments();
 	}
 
-	private static void parsePageAndAddToDB(String site) {
-		try {
-			if (PM.checkIfExistsLink(site)) {
-				System.err.println("Post juz istnieje!!!");
-				return;
-			}
-			Document doc = Jsoup.connect(site).get();
-			// 1
-			Author author = new Author();
-			getAuthor(author, doc);
-			Author findedAuthor = AM.getAuthorByName(author.getName());
-			if (findedAuthor != null) {
-				author = findedAuthor;
-			} else {
-				if (author.getLink() == null && author.getName() == null) {
-					System.err.println("Autor jest pusty!!!");
-					return;
-				}
-				AM.addAuthor(author);
-				if (author.getId() == 0) {
-					System.err.println("Autor nie zapisal sie!!!");
-					return;
-				}
-			}
-			// 2
-			Category category = new Category();
-			getCategory(category, doc);
-
-			Category findedCategory = CM.getCategoryByName(category
-					.getCategoryName());
-			if (findedCategory != null) {
-				category = findedCategory;
-			} else {
-				if (category.getCategoryName() == null) {
-					System.err.println("Kategoria jest pusta!!!");
-					return;
-				}
-				CM.addCategory(category);
-				if (category.getId() == 0) {
-					System.err.println("Kategoria nie zapisala sie!!!");
-					return;
-				}
-			}
-			// 3
-			Post post = new Post();
-			post.setLink(site.substring(0,
-					site.indexOf(".html") + ".html".length()));
-			getSiteNum(site, post);
-			getDate(post, doc);
-			getTitle(post, doc);
-			getContent(post, doc);
-			post.setZrobiona(false);
-			post.setAuthor(author);
-			post.setCategory(category);
-			// Post findedPost = PM.getPostByLink(post.getLink());
-			// if (findedPost != null) {
-			// post = findedPost;
-			// } else {
-			PM.addPost(post);
-			if (post.getId() == 0) {
-				System.err.println("Post sie nie zapisal!!!");
-				return;
-			}
-			// }
-
-			// 4 + 5
-			for (Element el : doc.getElementsByAttributeValue("name",
-					"sailthru.tags")) {
-				for (String tagString : Arrays.asList(el.attr("content").split(
-						"\\s*,\\s*"))) {
-					Tag tag = new Tag();
-					tag.setName(tagString);
-					Tag findedTag = TM.getTagByName(tag);
-					if (findedTag != null) {
-						tag = findedTag;
-					} else {
-						TM.addTag(tag);
-						if (tag.getId() == 0) {
-							System.err.println("Tag nie zapisal sie!!!");
-							return;
-						}
-					}
-					PostTag postTag = new PostTag();
-					postTag.setPost_id(post);
-					postTag.setTag_id(tag);
-					PTM.addPostTag(postTag);
-				}
-
-			}
-			// 6 + 7
-			Topic topic = new Topic();
-			getTopic(topic, doc, site);
-			Topic findedTopic = TopicM.getTopicByName(topic.getKeywords());
-			if (findedTopic != null) {
-				topic = findedTopic;
-			} else {
-				if (topic.getKeywords() == null) {
-					System.err.println("Topic jest pusty!!!");
-					// return;
-				}
-				TopicM.addTopic(topic);
-				if (topic.getId() == 0) {
-					System.err.println("Topic nie zapisal sie!!!");
-					return;
-				}
-			}
-
-			PostTopic postTopic = new PostTopic();
-			postTopic.setPost_id(post);
-			postTopic.setTopic_id(topic);
-			PTopicM.addPostTopic(postTopic);
-			// 8+9
-			Document docFb = Jsoup.connect(
-					FB_COMMENTS_START + site + FB_COMMENTS_END).get();
-
-			for (Element el : docFb.getElementsByClass("fbTopLevelComment")) {
-				Comment comment = new Comment();
-				comment.setPost(post);
-				Element contentElement = null;
-				boolean shouldSearch = true;
-				Elements elements = el.getElementsByTag("div");
-				for (int i = 0; i < elements.size() && shouldSearch; i++) {
-					Element elDiv = elements.get(i);
-					System.out.println("elDiv:" + elDiv.className());
-					if (elDiv.className().startsWith("postContainer")) {
-						contentElement = elDiv;
-						shouldSearch = false;
-					}
-				}
-				for (Element elAuthor : contentElement
-						.getElementsByClass("profileName")) {
-					System.out.println("elAuthor:" + elAuthor.className());
-					author = new Author();
-					author.setName(elAuthor.html());
-					author.setLink(elAuthor.attr("href").equals("#") ? author
-							.getName() : elAuthor.attr("href"));
-					findedAuthor = AM.getAuthorByName(author.getName());
-					if (findedAuthor != null) {
-						author = findedAuthor;
-					} else {
-						if (author.getLink() == null
-								&& author.getName() == null) {
-							System.err.println("Autor jest pusty!!!");
-							return;
-						}
-						AM.addAuthor(author);
-						if (author.getId() == 0) {
-							System.err.println("Autor nie zapisal sie!!!");
-							return;
-						}
-					}
-					comment.setAuthor(author);
-				}
-				for (Element elText : contentElement
-						.getElementsByClass("postText")) {
-					System.out.println("elText:" + elText.className());
-					comment.setContent(elText.html().replaceAll(
-							PATTERN_DELETE_TAGS, ""));
-				}
-				for (Element elDate : contentElement.getElementsByTag("abbr")) {
-					System.out.println("elDate:" + elDate.className());
-					DateFormat dateFormat = new SimpleDateFormat(
-							"EEEE, MMMM d, yyyy 'at' h:mma", Locale.US);
-					comment.setDate(dateFormat.parse(elDate.attr("title")));
-				}
-
-				Comment findedComment = CommentM.getCommentByName(comment);
-				if (findedComment != null) {
-					comment = findedComment;
-				} else {
-					if (comment.getContent() == null
-							&& comment.getTitle() == null) {
-						System.err.println("Koment jest pusty!!!");
-						return;
-					}
-					CommentM.addComment(comment);
-					if (comment.getId() == 0) {
-						System.err.println("Koment nie zapisal sie!!!");
-						return;
-					}
-				}
-				topic = new Topic();
-				topic.setKeywords(countWords(comment.getContent()));
-				findedTopic = TopicM.getTopicByName(topic.getKeywords());
-				if (findedTopic != null) {
-					topic = findedTopic;
-				} else {
-					if (topic.getKeywords() == null) {
-						System.err.println("Topic jest pusty!!!");
-						return;
-					}
-					TopicM.addTopic(topic);
-					if (topic.getId() == 0) {
-						System.err.println("Topic nie zapisal sie!!!");
-						return;
-					}
-				}
-				CommentTopic commentTopic = new CommentTopic();
-				commentTopic.setComment_id(comment);
-				commentTopic.setTopic_id(topic);
-				CTopicM.addCommentTopic(commentTopic);
-
-				for (Element elReplies : el.child(0).getElementsByClass(
-						"fbCommentReply")) {
-					System.out.println("elReplies:" + elReplies.className());
-					Comment commentReply = new Comment();
-					commentReply.setPost(post);
-					Element contentElementReply = null;
-					boolean shouldSearchReply = true;
-					Elements elementsReply = elReplies.getElementsByTag("div");
-					for (int i = 0; i < elementsReply.size()
-							&& shouldSearchReply; i++) {
-						Element elDiv = elementsReply.get(i);
-						System.out.println("elDiv:" + elDiv.className());
-						if (elDiv.className().startsWith("postContainer")) {
-							contentElementReply = elDiv;
-							shouldSearchReply = false;
-						}
-					}
-					for (Element elAuthor : contentElementReply
-							.getElementsByClass("profileName")) {
-						System.out.println("elAuthor:" + elAuthor.className());
-						author = new Author();
-						author.setName(elAuthor.html());
-						author.setLink(elAuthor.attr("href").equals("#") ? author
-								.getName() : elAuthor.attr("href"));
-						findedAuthor = AM.getAuthorByName(author.getName());
-						if (findedAuthor != null) {
-							author = findedAuthor;
-						} else {
-							if (author.getLink() == null
-									&& author.getName() == null) {
-								System.err.println("Autor jest pusty!!!");
-								return;
-							}
-							AM.addAuthor(author);
-							if (author.getId() == 0) {
-								System.err.println("Autor nie zapisal sie!!!");
-								return;
-							}
-						}
-						commentReply.setAuthor(author);
-					}
-					for (Element elText : contentElementReply
-							.getElementsByClass("postText")) {
-						System.out.println("elText:" + elText.className());
-						commentReply.setContent(elText.html().replaceAll(
-								PATTERN_DELETE_TAGS, ""));
-					}
-					for (Element elDate : contentElementReply
-							.getElementsByTag("abbr")) {
-						System.out.println("elDate:" + elDate.className());
-						DateFormat dateFormat = new SimpleDateFormat(
-								"EEEE, MMMM d, yyyy 'at' h:mma", Locale.US);
-						commentReply.setDate(dateFormat.parse(elDate
-								.attr("title")));
-					}
-					commentReply.setComment(comment);
-
-					findedComment = CommentM.getCommentByName(commentReply);
-					if (findedComment != null) {
-						commentReply = findedComment;
-					} else {
-						if (commentReply.getContent() == null
-								&& commentReply.getTitle() == null) {
-							System.err.println("Koment jest pusty!!!");
-							return;
-						}
-						CommentM.addComment(commentReply);
-						if (commentReply.getId() == 0) {
-							System.err.println("Koment nie zapisal sie!!!");
-							return;
-						}
-					}
-					topic = new Topic();
-					topic.setKeywords(countWords(commentReply.getContent()));
-					findedTopic = TopicM.getTopicByName(topic.getKeywords());
-					if (findedTopic != null) {
-						topic = findedTopic;
-					} else {
-						if (topic.getKeywords() == null) {
-							System.err.println("Topic jest pusty!!!");
-							return;
-						}
-						TopicM.addTopic(topic);
-						if (topic.getId() == 0) {
-							System.err.println("Topic nie zapisal sie!!!");
-							return;
-						}
-					}
-
-					commentTopic = new CommentTopic();
-					commentTopic.setComment_id(commentReply);
-					commentTopic.setTopic_id(topic);
-					CTopicM.addCommentTopic(commentTopic);
-				}
-
-			}
-			System.out.println("KONIEC!!! WYLACZ APKE!!!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public static void mergeAllPosts() {
+		int firstResult = 0;
+		int maxResults = 50000;
+		boolean bool = true;
+		while (bool) {
+			bool = PostManipulate.mergeAllPosts(
+					OldHuffingtonFactoryMaker.getSessionFactory(Post.class),
+					HuffingtonFactoryMaker.getSessionFactory(Post.class),
+					firstResult, maxResults);
+			firstResult += maxResults;
 		}
+
+		System.out.println("DONE!!!");
 	}
+
+	public static void mergeAllComments() {
+		int firstResult = 0;
+		int maxResults = 50000;
+		boolean bool = true;
+		// while (bool) {
+		bool = CommentManipulate.mergeAllComments(
+				OldHuffingtonFactoryMaker.getSessionFactory(Comment.class),
+				HuffingtonFactoryMaker.getSessionFactory(Comment.class),
+				firstResult, maxResults);
+		firstResult += maxResults;
+		// }
+
+		System.out.println("DONE!!!");
+	}
+
+	// private static void parsePageAndAddToDB(String site) {
+	// try {
+	// if (PM.checkIfExistsLink(site)) {
+	// System.err.println("Post juz istnieje!!!");
+	// return;
+	// }
+	// Document doc = Jsoup.connect(site).get();
+	// // 1
+	// Author author = new Author();
+	// getAuthor(author, doc);
+	// Author findedAuthor = AM.getAuthorByName(author.getName());
+	// if (findedAuthor != null) {
+	// author = findedAuthor;
+	// } else {
+	// if (author.getLink() == null && author.getName() == null) {
+	// System.err.println("Autor jest pusty!!!");
+	// return;
+	// }
+	// AM.addAuthor(author);
+	// if (author.getId() == 0) {
+	// System.err.println("Autor nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// // 2
+	// Category category = new Category();
+	// getCategory(category, doc);
+	//
+	// Category findedCategory = CM.getCategoryByName(category
+	// .getCategoryName());
+	// if (findedCategory != null) {
+	// category = findedCategory;
+	// } else {
+	// if (category.getCategoryName() == null) {
+	// System.err.println("Kategoria jest pusta!!!");
+	// return;
+	// }
+	// CM.addCategory(category);
+	// if (category.getId() == 0) {
+	// System.err.println("Kategoria nie zapisala sie!!!");
+	// return;
+	// }
+	// }
+	// // 3
+	// Post post = new Post();
+	// post.setLink(site.substring(0,
+	// site.indexOf(".html") + ".html".length()));
+	// getSiteNum(site, post);
+	// getDate(post, doc);
+	// getTitle(post, doc);
+	// getContent(post, doc);
+	// post.setZrobiona(false);
+	// post.setAuthor(author);
+	// post.setCategory(category);
+	// // Post findedPost = PM.getPostByLink(post.getLink());
+	// // if (findedPost != null) {
+	// // post = findedPost;
+	// // } else {
+	// PM.addPost(post);
+	// if (post.getId() == 0) {
+	// System.err.println("Post sie nie zapisal!!!");
+	// return;
+	// }
+	// // }
+	//
+	// // 4 + 5
+	// for (Element el : doc.getElementsByAttributeValue("name",
+	// "sailthru.tags")) {
+	// for (String tagString : Arrays.asList(el.attr("content").split(
+	// "\\s*,\\s*"))) {
+	// Tag tag = new Tag();
+	// tag.setName(tagString);
+	// Tag findedTag = TM.getTagByName(tag);
+	// if (findedTag != null) {
+	// tag = findedTag;
+	// } else {
+	// TM.addTag(tag);
+	// if (tag.getId() == 0) {
+	// System.err.println("Tag nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// PostTag postTag = new PostTag();
+	// postTag.setPost_id(post);
+	// postTag.setTag_id(tag);
+	// PTM.addPostTag(postTag);
+	// }
+	//
+	// }
+	// // 6 + 7
+	// Topic topic = new Topic();
+	// getTopic(topic, doc, site);
+	// Topic findedTopic = TopicM.getTopicByName(topic.getKeywords());
+	// if (findedTopic != null) {
+	// topic = findedTopic;
+	// } else {
+	// if (topic.getKeywords() == null) {
+	// System.err.println("Topic jest pusty!!!");
+	// // return;
+	// }
+	// TopicM.addTopic(topic);
+	// if (topic.getId() == 0) {
+	// System.err.println("Topic nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	//
+	// PostTopic postTopic = new PostTopic();
+	// postTopic.setPost_id(post);
+	// postTopic.setTopic_id(topic);
+	// PTopicM.addPostTopic(postTopic);
+	// // 8+9
+	// Document docFb = Jsoup.connect(
+	// FB_COMMENTS_START + site + FB_COMMENTS_END).get();
+	//
+	// for (Element el : docFb.getElementsByClass("fbTopLevelComment")) {
+	// Comment comment = new Comment();
+	// comment.setPost(post);
+	// Element contentElement = null;
+	// boolean shouldSearch = true;
+	// Elements elements = el.getElementsByTag("div");
+	// for (int i = 0; i < elements.size() && shouldSearch; i++) {
+	// Element elDiv = elements.get(i);
+	// System.out.println("elDiv:" + elDiv.className());
+	// if (elDiv.className().startsWith("postContainer")) {
+	// contentElement = elDiv;
+	// shouldSearch = false;
+	// }
+	// }
+	// for (Element elAuthor : contentElement
+	// .getElementsByClass("profileName")) {
+	// System.out.println("elAuthor:" + elAuthor.className());
+	// author = new Author();
+	// author.setName(elAuthor.html());
+	// author.setLink(elAuthor.attr("href").equals("#") ? author
+	// .getName() : elAuthor.attr("href"));
+	// findedAuthor = AM.getAuthorByName(author.getName());
+	// if (findedAuthor != null) {
+	// author = findedAuthor;
+	// } else {
+	// if (author.getLink() == null
+	// && author.getName() == null) {
+	// System.err.println("Autor jest pusty!!!");
+	// return;
+	// }
+	// AM.addAuthor(author);
+	// if (author.getId() == 0) {
+	// System.err.println("Autor nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// comment.setAuthor(author);
+	// }
+	// for (Element elText : contentElement
+	// .getElementsByClass("postText")) {
+	// System.out.println("elText:" + elText.className());
+	// comment.setContent(elText.html().replaceAll(
+	// PATTERN_DELETE_TAGS, ""));
+	// }
+	// for (Element elDate : contentElement.getElementsByTag("abbr")) {
+	// System.out.println("elDate:" + elDate.className());
+	// DateFormat dateFormat = new SimpleDateFormat(
+	// "EEEE, MMMM d, yyyy 'at' h:mma", Locale.US);
+	// comment.setDate(dateFormat.parse(elDate.attr("title")));
+	// }
+	//
+	// Comment findedComment = CommentM.getCommentByName(comment);
+	// if (findedComment != null) {
+	// comment = findedComment;
+	// } else {
+	// if (comment.getContent() == null
+	// && comment.getTitle() == null) {
+	// System.err.println("Koment jest pusty!!!");
+	// return;
+	// }
+	// CommentM.addComment(comment);
+	// if (comment.getId() == 0) {
+	// System.err.println("Koment nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// topic = new Topic();
+	// topic.setKeywords(countWords(comment.getContent()));
+	// findedTopic = TopicM.getTopicByName(topic.getKeywords());
+	// if (findedTopic != null) {
+	// topic = findedTopic;
+	// } else {
+	// if (topic.getKeywords() == null) {
+	// System.err.println("Topic jest pusty!!!");
+	// return;
+	// }
+	// TopicM.addTopic(topic);
+	// if (topic.getId() == 0) {
+	// System.err.println("Topic nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// CommentTopic commentTopic = new CommentTopic();
+	// commentTopic.setComment_id(comment);
+	// commentTopic.setTopic_id(topic);
+	// CTopicM.addCommentTopic(commentTopic);
+	//
+	// for (Element elReplies : el.child(0).getElementsByClass(
+	// "fbCommentReply")) {
+	// System.out.println("elReplies:" + elReplies.className());
+	// Comment commentReply = new Comment();
+	// commentReply.setPost(post);
+	// Element contentElementReply = null;
+	// boolean shouldSearchReply = true;
+	// Elements elementsReply = elReplies.getElementsByTag("div");
+	// for (int i = 0; i < elementsReply.size()
+	// && shouldSearchReply; i++) {
+	// Element elDiv = elementsReply.get(i);
+	// System.out.println("elDiv:" + elDiv.className());
+	// if (elDiv.className().startsWith("postContainer")) {
+	// contentElementReply = elDiv;
+	// shouldSearchReply = false;
+	// }
+	// }
+	// for (Element elAuthor : contentElementReply
+	// .getElementsByClass("profileName")) {
+	// System.out.println("elAuthor:" + elAuthor.className());
+	// author = new Author();
+	// author.setName(elAuthor.html());
+	// author.setLink(elAuthor.attr("href").equals("#") ? author
+	// .getName() : elAuthor.attr("href"));
+	// findedAuthor = AM.getAuthorByName(author.getName());
+	// if (findedAuthor != null) {
+	// author = findedAuthor;
+	// } else {
+	// if (author.getLink() == null
+	// && author.getName() == null) {
+	// System.err.println("Autor jest pusty!!!");
+	// return;
+	// }
+	// AM.addAuthor(author);
+	// if (author.getId() == 0) {
+	// System.err.println("Autor nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// commentReply.setAuthor(author);
+	// }
+	// for (Element elText : contentElementReply
+	// .getElementsByClass("postText")) {
+	// System.out.println("elText:" + elText.className());
+	// commentReply.setContent(elText.html().replaceAll(
+	// PATTERN_DELETE_TAGS, ""));
+	// }
+	// for (Element elDate : contentElementReply
+	// .getElementsByTag("abbr")) {
+	// System.out.println("elDate:" + elDate.className());
+	// DateFormat dateFormat = new SimpleDateFormat(
+	// "EEEE, MMMM d, yyyy 'at' h:mma", Locale.US);
+	// commentReply.setDate(dateFormat.parse(elDate
+	// .attr("title")));
+	// }
+	// commentReply.setComment(comment);
+	//
+	// findedComment = CommentM.getCommentByName(commentReply);
+	// if (findedComment != null) {
+	// commentReply = findedComment;
+	// } else {
+	// if (commentReply.getContent() == null
+	// && commentReply.getTitle() == null) {
+	// System.err.println("Koment jest pusty!!!");
+	// return;
+	// }
+	// CommentM.addComment(commentReply);
+	// if (commentReply.getId() == 0) {
+	// System.err.println("Koment nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	// topic = new Topic();
+	// topic.setKeywords(countWords(commentReply.getContent()));
+	// findedTopic = TopicM.getTopicByName(topic.getKeywords());
+	// if (findedTopic != null) {
+	// topic = findedTopic;
+	// } else {
+	// if (topic.getKeywords() == null) {
+	// System.err.println("Topic jest pusty!!!");
+	// return;
+	// }
+	// TopicM.addTopic(topic);
+	// if (topic.getId() == 0) {
+	// System.err.println("Topic nie zapisal sie!!!");
+	// return;
+	// }
+	// }
+	//
+	// commentTopic = new CommentTopic();
+	// commentTopic.setComment_id(commentReply);
+	// commentTopic.setTopic_id(topic);
+	// CTopicM.addCommentTopic(commentTopic);
+	// }
+	//
+	// }
+	// System.out.println("KONIEC!!! WYLACZ APKE!!!");
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// } catch (ParseException e) {
+	// e.printStackTrace();
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
 
 	private static String countWords(String text) {
 		text = text.toLowerCase();
