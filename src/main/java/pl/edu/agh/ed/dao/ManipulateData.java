@@ -87,13 +87,13 @@ public class ManipulateData {
 		int firstResult = 0;
 		int maxResults = 50000;
 		boolean bool = true;
-		// while (bool) {
-		bool = CommentManipulate.mergeAllComments(
-				OldHuffingtonFactoryMaker.getSessionFactory(Comment.class),
-				HuffingtonFactoryMaker.getSessionFactory(Comment.class),
-				firstResult, maxResults);
-		firstResult += maxResults;
-		// }
+		while (bool) {
+			bool = CommentManipulate.mergeAllComments(
+					OldHuffingtonFactoryMaker.getSessionFactory(Comment.class),
+					HuffingtonFactoryMaker.getSessionFactory(Comment.class),
+					firstResult, maxResults);
+			firstResult += maxResults;
+		}
 
 		System.out.println("DONE!!!");
 	}
